@@ -1,0 +1,204 @@
+{
+  "feature_cols": [
+    "latitude",
+    "longitude",
+    "month",
+    "day_of_year",
+    "day_of_week",
+    "season_code",
+    "location_code",
+    "is_cyclone_season",
+    "lag_1_tmax",
+    "lag_3_tmax",
+    "lag_7_tmax",
+    "lag_1_tmin",
+    "lag_3_tmin",
+    "lag_7_tmin",
+    "lag_1_rain",
+    "lag_3_rain",
+    "lag_7_rain",
+    "roll_3_tmax",
+    "roll_7_tmax",
+    "roll_3_tmin",
+    "roll_7_tmin",
+    "roll_3_rain",
+    "roll_7_rain"
+  ],
+  "location_encoder": {
+    "Agartala": 0,
+    "Agra": 1,
+    "Bhubaneswar": 2,
+    "Chilika": 3,
+    "Darjeeling": 4,
+    "Delhi": 5,
+    "Gangtok": 6,
+    "Goa": 7,
+    "Gopalpur": 8,
+    "Guwahati": 9,
+    "Jaipur": 10,
+    "Kochi": 11,
+    "Konark": 12,
+    "Mumbai": 13,
+    "Puri": 14,
+    "Shillong": 15,
+    "Similipal": 16,
+    "Srinagar": 17,
+    "Tawang": 18,
+    "Varanasi": 19
+  },
+  "season_encoder": {
+    "Winter": 0,
+    "Summer": 1,
+    "Monsoon": 2,
+    "Post-Monsoon": 3
+  },
+  "locations": {
+    "Agartala": [
+      23.8315,
+      91.2868,
+      "Tripura",
+      "Northeast"
+    ],
+    "Shillong": [
+      25.5788,
+      91.8933,
+      "Meghalaya",
+      "Northeast"
+    ],
+    "Guwahati": [
+      26.1445,
+      91.7362,
+      "Assam",
+      "Northeast"
+    ],
+    "Tawang": [
+      27.5859,
+      91.8594,
+      "Arunachal Pradesh",
+      "Northeast (Himalayan)"
+    ],
+    "Gangtok": [
+      27.3389,
+      88.6065,
+      "Sikkim",
+      "Northeast (Himalayan)"
+    ],
+    "Darjeeling": [
+      27.041,
+      88.2663,
+      "West Bengal",
+      "East (Himalayan)"
+    ],
+    "Delhi": [
+      28.6139,
+      77.209,
+      "Delhi",
+      "North"
+    ],
+    "Jaipur": [
+      26.9124,
+      75.7873,
+      "Rajasthan",
+      "North (Arid)"
+    ],
+    "Agra": [
+      27.1767,
+      78.0081,
+      "Uttar Pradesh",
+      "North"
+    ],
+    "Goa": [
+      15.4909,
+      73.8278,
+      "Goa",
+      "West Coast"
+    ],
+    "Mumbai": [
+      19.076,
+      72.8777,
+      "Maharashtra",
+      "West Coast"
+    ],
+    "Kochi": [
+      9.9312,
+      76.2673,
+      "Kerala",
+      "South Coast"
+    ],
+    "Varanasi": [
+      25.3176,
+      82.9739,
+      "Uttar Pradesh",
+      "North / Gangetic Plain"
+    ],
+    "Srinagar": [
+      34.0837,
+      74.7973,
+      "Jammu & Kashmir",
+      "North (Himalayan)"
+    ],
+    "Bhubaneswar": [
+      20.2961,
+      85.8245,
+      "Odisha",
+      "Odisha (Temple City)"
+    ],
+    "Puri": [
+      19.8135,
+      85.8312,
+      "Odisha",
+      "Odisha (East Coast)"
+    ],
+    "Konark": [
+      19.8876,
+      86.0945,
+      "Odisha",
+      "Odisha (East Coast)"
+    ],
+    "Chilika": [
+      19.647,
+      85.4519,
+      "Odisha",
+      "Odisha (Lagoon/East Coast)"
+    ],
+    "Gopalpur": [
+      19.2647,
+      84.9006,
+      "Odisha",
+      "Odisha (East Coast)"
+    ],
+    "Similipal": [
+      21.9347,
+      86.7333,
+      "Odisha",
+      "Odisha (Inland Forest)"
+    ]
+  },
+  "rain_threshold_mm": 2.5,
+  "trained_on_rows": 51040,
+  "train_date_range": [
+    "2015-01-08",
+    "2022-01-02"
+  ],
+  "test_metrics": {
+    "tmax": {
+      "model": "Tmax (test)",
+      "MAE": 1.122795824086819,
+      "RMSE": 1.5370107353684404,
+      "R2": 0.960036754286509
+    },
+    "tmin": {
+      "model": "Tmin (test)",
+      "MAE": 0.917638167349916,
+      "RMSE": 1.2935371002667373,
+      "R2": 0.9778084217389628
+    },
+    "rain": {
+      "model": "Rain (test)",
+      "Accuracy": 0.8282967032967034,
+      "Precision": 0.7510506798516687,
+      "Recall": 0.7777777777777778,
+      "F1": 0.764180606213055
+    }
+  }
+}
