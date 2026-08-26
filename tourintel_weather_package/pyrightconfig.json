@@ -1,0 +1,7 @@
+{
+  "venvPath": "C:/Users/KIIT/Downloads/tourintel_weather_package",
+  "venv": ".conda",
+  "extraPaths": [
+    "tourintel"
+  ]
+}
