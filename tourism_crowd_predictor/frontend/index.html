@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crowd Almanac — India Tourism Forecasting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14131B;
+    --ink-soft:#1B1926;
+    --surface:#211F2E;
+    --surface-raised:#2A2739;
+    --hairline:#3A374A;
+    --paper:#F3EDE0;
+    --paper-dim:#B9B3A6;
+    --muted:#8E8AA0;
+    --marigold:#E8A33D;
+    --marigold-dim:#4A3A22;
+    --teal:#3AA396;
+    --teal-dim:#1D3A36;
+    --crimson:#D25C4F;
+    --crimson-dim:#442622;
+    --radius-lg:18px;
+    --radius-sm:9px;
+    --shadow:0 20px 50px -20px rgba(0,0,0,0.6);
+  }
+
+  *{box-sizing:border-box;}
+  html{-webkit-font-smoothing:antialiased;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse 1200px 600px at 15% -10%, #241f36 0%, transparent 60%),
+      radial-gradient(ellipse 900px 500px at 100% 0%, #23301f 0%, transparent 55%),
+      var(--ink);
+    color:var(--paper);
+    font-family:"IBM Plex Sans", sans-serif;
+    line-height:1.5;
+    min-height:100vh;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+
+  a{color:inherit;}
+  .mono{font-family:"IBM Plex Mono", monospace; font-variant-numeric:tabular-nums;}
+  .display{font-family:"Fraunces", serif;}
+
+  /* ---------------------------------------------------------------- */
+  /* Layout shell                                                     */
+  /* ---------------------------------------------------------------- */
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px 96px;}
+
+  header.top{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:28px 24px 0; max-width:1080px; margin:0 auto;
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:34px; height:34px; border-radius:50%;
+    background:conic-gradient(from 210deg, var(--marigold), var(--crimson), var(--teal), var(--marigold));
+    box-shadow:0 0 0 3px var(--ink-soft), 0 0 24px -6px var(--marigold);
+    flex-shrink:0;
+  }
+  .brand-name{font-family:"Fraunces", serif; font-weight:600; font-size:18px; letter-spacing:0.01em;}
+  .brand-sub{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.12em; margin-top:1px;}
+
+  .status-pill{
+    display:flex; align-items:center; gap:8px;
+    font-size:12px; color:var(--muted);
+    padding:7px 13px; border:1px solid var(--hairline); border-radius:999px;
+    background:rgba(255,255,255,0.02);
+  }
+  .status-dot{width:7px; height:7px; border-radius:50%; background:var(--muted); flex-shrink:0;}
+  .status-dot.ok{background:var(--teal); box-shadow:0 0 0 3px var(--teal-dim);}
+  .status-dot.down{background:var(--crimson); box-shadow:0 0 0 3px var(--crimson-dim);}
+  .status-dot.ok{animation:pulse 2.4s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;} 50%{opacity:0.45;}}
+
+  /* ---------------------------------------------------------------- */
+  /* Hero                                                             */
+  /* ---------------------------------------------------------------- */
+  .hero{padding:56px 0 40px; text-align:center;}
+  .eyebrow{
+    font-size:12px; letter-spacing:0.16em; text-transform:uppercase;
+    color:var(--marigold); font-weight:600; margin-bottom:16px;
+  }
+  h1.hero-title{
+    font-size:clamp(32px, 5.4vw, 54px); font-weight:600; line-height:1.06;
+    margin:0 0 18px; letter-spacing:-0.01em;
+  }
+  h1.hero-title em{
+    font-style:normal; color:var(--marigold);
+    background:linear-gradient(180deg, transparent 62%, var(--marigold-dim) 62%);
+  }
+  .hero-desc{
+    max-width:520px; margin:0 auto 34px; color:var(--paper-dim); font-size:16px;
+  }
+
+  .search-shell{max-width:480px; margin:0 auto; position:relative;}
+  .search-box{
+    display:flex; align-items:center; gap:10px;
+    background:var(--surface); border:1px solid var(--hairline);
+    border-radius:var(--radius-lg); padding:6px 8px 6px 18px;
+    box-shadow:var(--shadow);
+    transition:border-color 0.15s ease;
+  }
+  .search-box:focus-within{border-color:var(--marigold);}
+  .search-box svg{flex-shrink:0; color:var(--muted);}
+  .search-box input{
+    flex:1; background:none; border:none; outline:none; color:var(--paper);
+    font-family:"IBM Plex Sans", sans-serif; font-size:15px; padding:10px 0;
+  }
+  .search-box input::placeholder{color:var(--muted);}
+  .search-box button{
+    background:var(--marigold); color:#221805; border:none; border-radius:12px;
+    padding:11px 18px; font-weight:600; font-size:14px; cursor:pointer;
+    font-family:"IBM Plex Sans", sans-serif;
+    transition:transform 0.12s ease, background 0.12s ease;
+  }
+  .search-box button:hover{background:#f0b355;}
+  .search-box button:active{transform:scale(0.97);}
+  .search-box button:focus-visible, input:focus-visible, .card:focus-visible, .month-btn:focus-visible{
+    outline:2px solid var(--marigold); outline-offset:2px;
+  }
+
+  .autocomplete{
+    position:absolute; top:calc(100% + 8px); left:0; right:0;
+    background:var(--surface-raised); border:1px solid var(--hairline);
+    border-radius:var(--radius-sm); box-shadow:var(--shadow);
+    overflow:hidden; z-index:20; text-align:left; display:none;
+  }
+  .autocomplete.open{display:block;}
+  .autocomplete .ac-item{
+    padding:11px 16px; cursor:pointer; display:flex; justify-content:space-between; gap:12px;
+    border-bottom:1px solid var(--hairline); font-size:14px;
+  }
+  .autocomplete .ac-item:last-child{border-bottom:none;}
+  .autocomplete .ac-item:hover, .autocomplete .ac-item.active{background:rgba(232,163,61,0.09);}
+  .ac-item .ac-name{font-weight:500;}
+  .ac-item .ac-meta{color:var(--muted); font-size:12px; white-space:nowrap;}
+
+  /* ---------------------------------------------------------------- */
+  /* Section headings                                                 */
+  /* ---------------------------------------------------------------- */
+  .section-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    margin:56px 0 18px;
+  }
+  .section-head h2{
+    font-family:"Fraunces", serif; font-weight:600; font-size:22px; margin:0;
+  }
+  .section-head .hint{font-size:12px; color:var(--muted);}
+
+  /* ---------------------------------------------------------------- */
+  /* Place cards grid                                                 */
+  /* ---------------------------------------------------------------- */
+  .grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:14px;}
+  .card{
+    background:var(--surface); border:1px solid var(--hairline); border-radius:var(--radius-sm);
+    padding:18px; cursor:pointer; text-align:left;
+    transition:transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+    font-family:inherit; color:inherit;
+  }
+  .card:hover{transform:translateY(-3px); border-color:var(--marigold); background:var(--surface-raised);}
+  .card .cat{
+    font-size:10.5px; text-transform:uppercase; letter-spacing:0.1em; color:var(--marigold);
+    font-weight:600; margin-bottom:8px;
+  }
+  .card .name{font-weight:600; font-size:15.5px; margin-bottom:4px; line-height:1.3;}
+  .card .state{font-size:12.5px; color:var(--muted);}
+  .card .pop-bar{
+    margin-top:14px; height:4px; border-radius:2px; background:var(--hairline); overflow:hidden;
+  }
+  .card .pop-bar > span{display:block; height:100%; background:var(--teal); border-radius:2px;}
+
+  /* ---------------------------------------------------------------- */
+  /* Detail / ticket panel                                            */
+  /* ---------------------------------------------------------------- */
+  .panel{
+    display:none;
+    background:var(--surface); border:1px solid var(--hairline); border-radius:var(--radius-lg);
+    padding:32px; margin-top:56px; box-shadow:var(--shadow);
+  }
+  .panel.open{display:block; animation:rise 0.35s ease;}
+  @keyframes rise{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+
+  .panel-head{display:flex; justify-content:space-between; align-items:flex-start; gap:20px; flex-wrap:wrap; margin-bottom:24px;}
+  .panel-head .pt{font-size:11px; text-transform:uppercase; letter-spacing:0.12em; color:var(--marigold); font-weight:600; margin-bottom:6px;}
+  .panel-head h3{font-family:"Fraunces", serif; font-size:28px; font-weight:600; margin:0 0 4px;}
+  .panel-head .loc{color:var(--muted); font-size:14px;}
+  .close-btn{
+    background:none; border:1px solid var(--hairline); color:var(--muted); border-radius:8px;
+    width:32px; height:32px; cursor:pointer; font-size:16px; flex-shrink:0;
+  }
+  .close-btn:hover{color:var(--paper); border-color:var(--paper-dim);}
+
+  .month-picker{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:26px;}
+  .month-btn{
+    background:var(--ink-soft); border:1px solid var(--hairline); color:var(--paper-dim);
+    border-radius:8px; padding:8px 12px; font-size:12.5px; cursor:pointer;
+    font-family:"IBM Plex Mono", monospace;
+    transition:background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+  }
+  .month-btn:hover{border-color:var(--paper-dim); color:var(--paper);}
+  .month-btn.active{background:var(--marigold); border-color:var(--marigold); color:#221805; font-weight:600;}
+
+  .result-row{display:flex; gap:24px; flex-wrap:wrap; margin-bottom:36px;}
+  .result-card{
+    flex:1; min-width:240px; background:var(--ink-soft); border:1px solid var(--hairline);
+    border-radius:var(--radius-sm); padding:22px;
+  }
+  .level-pill{
+    display:inline-flex; align-items:center; gap:8px; padding:6px 14px; border-radius:999px;
+    font-weight:600; font-size:13px; margin-bottom:14px;
+  }
+  .level-pill .dot{width:8px; height:8px; border-radius:50%;}
+  .level-Low{background:var(--teal-dim); color:#8FD9CC;} .level-Low .dot{background:var(--teal);}
+  .level-Medium{background:var(--marigold-dim); color:#F4C880;} .level-Medium .dot{background:var(--marigold);}
+  .level-High{background:var(--crimson-dim); color:#F0A69C;} .level-High .dot{background:var(--crimson);}
+
+  .result-summary{font-size:15px; margin-bottom:14px; color:var(--paper);}
+  .confidence-track{height:6px; background:var(--hairline); border-radius:3px; overflow:hidden; margin-bottom:6px;}
+  .confidence-track > span{display:block; height:100%; background:var(--marigold);}
+  .confidence-label{font-size:11.5px; color:var(--muted);}
+
+  .alt-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px;}
+  .alt-list li{
+    display:flex; justify-content:space-between; font-size:13.5px;
+    padding:9px 0; border-bottom:1px solid var(--hairline);
+  }
+  .alt-list li:last-child{border-bottom:none;}
+  .alt-list .alt-state{color:var(--muted); font-size:12px;}
+
+  /* ---------------------------------------------------------------- */
+  /* Signature element: the ticket strip (12-month crowd almanac)     */
+  /* ---------------------------------------------------------------- */
+  .strip-label{font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:10px;}
+  .ticket-strip{
+    display:flex; overflow-x:auto; border-radius:var(--radius-sm);
+    background:var(--ink-soft); border:1px solid var(--hairline); padding:4px;
+    gap:0;
+  }
+  .stub{
+    flex:1 0 76px; position:relative; text-align:center; padding:16px 6px 12px;
+    border-right:none;
+    background-image:radial-gradient(circle, var(--ink-soft) 2.5px, transparent 2.6px);
+    background-position:top center, bottom center;
+    background-size:12px 12px;
+    background-repeat:repeat-x;
+  }
+  .stub:not(:last-child){
+    background-image:
+      radial-gradient(circle, var(--ink-soft) 2.5px, transparent 2.6px),
+      linear-gradient(var(--hairline), var(--hairline));
+    background-position:right top, right center;
+    background-size:9px 100%, 1px 100%;
+    background-repeat:repeat-y, no-repeat;
+  }
+  .stub .m{font-family:"IBM Plex Mono", monospace; font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;}
+  .stub .chip{
+    width:100%; border-radius:6px; padding:8px 4px; font-size:10.5px; font-weight:600;
+    font-family:"IBM Plex Mono", monospace;
+  }
+  .stub .chip.Low{background:var(--teal-dim); color:#8FD9CC;}
+  .stub .chip.Medium{background:var(--marigold-dim); color:#F4C880;}
+  .stub .chip.High{background:var(--crimson-dim); color:#F0A69C;}
+
+  .outlook-note{margin-top:14px; font-size:13px; color:var(--paper-dim);}
+  .outlook-note b{color:var(--paper); font-weight:600;}
+
+  /* ---------------------------------------------------------------- */
+  /* Empty / error / loading states                                   */
+  /* ---------------------------------------------------------------- */
+  .state-msg{
+    text-align:center; padding:48px 20px; color:var(--muted); font-size:14px;
+    border:1px dashed var(--hairline); border-radius:var(--radius-sm);
+  }
+  .state-msg b{color:var(--paper-dim); display:block; margin-bottom:6px; font-size:15px;}
+  .skeleton{
+    background:linear-gradient(90deg, var(--surface) 25%, var(--surface-raised) 50%, var(--surface) 75%);
+    background-size:200% 100%; animation:shimmer 1.4s ease-in-out infinite; border-radius:var(--radius-sm);
+    height:96px;
+  }
+  @keyframes shimmer{0%{background-position:200% 0;} 100%{background-position:-200% 0;}}
+
+  /* ---------------------------------------------------------------- */
+  /* Footer status board                                              */
+  /* ---------------------------------------------------------------- */
+  footer{margin-top:70px; border-top:1px solid var(--hairline); padding-top:24px;}
+  .board{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:16px;
+    font-family:"IBM Plex Mono", monospace;
+  }
+  .board-cell .k{font-size:10.5px; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:6px;}
+  .board-cell .v{font-size:19px; color:var(--paper); font-weight:600;}
+  .board-cell .v.small{font-size:14px;}
+  footer .credit{margin-top:24px; font-size:11.5px; color:var(--muted); text-align:center;}
+
+  ::-webkit-scrollbar{height:8px; width:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--hairline); border-radius:4px;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true"></div>
+    <div>
+      <div class="brand-name">Crowd Almanac</div>
+      <div class="brand-sub">India Tourism Forecasting</div>
+    </div>
+  </div>
+  <div class="status-pill">
+    <span class="status-dot" id="statusDot"></span>
+    <span id="statusText">Checking model…</span>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <div class="eyebrow">Monthly crowd forecasts, place by place</div>
+    <h1 class="hero-title">Know before you go —<br>which month is <em>quiet</em>.</h1>
+    <p class="hero-desc">Search any Indian monument, beach, or hill station. We predict Low, Medium, or High crowd for every month, so you can plan around the calm ones.</p>
+
+    <div class="search-shell">
+      <div class="search-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="searchInput" type="text" placeholder="Try “Taj Mahal”, “Goa”, or “beach”…" autocomplete="off">
+        <button id="searchBtn">Search</button>
+      </div>
+      <div class="autocomplete" id="autocomplete"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Popular right now</h2>
+      <span class="hint">Ranked by popularity</span>
+    </div>
+    <div class="grid" id="topGrid">
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel">
+    <div class="panel-head">
+      <div>
+        <div class="pt" id="panelCat">—</div>
+        <h3 id="panelName">—</h3>
+        <div class="loc" id="panelLoc">—</div>
+      </div>
+      <button class="close-btn" id="closePanel" aria-label="Close">✕</button>
+    </div>
+
+    <div class="month-picker" id="monthPicker"></div>
+
+    <div class="result-row" id="resultRow" style="display:none;">
+      <div class="result-card">
+        <div id="levelPill"></div>
+        <div class="result-summary" id="resultSummary">—</div>
+        <div class="confidence-track"><span id="confidenceFill" style="width:0%"></span></div>
+        <div class="confidence-label" id="confidenceLabel">—</div>
+      </div>
+      <div class="result-card">
+        <div class="strip-label" style="margin-bottom:12px;">Quieter alternatives, same category &amp; month</div>
+        <ul class="alt-list" id="altList"><li>Loading…</li></ul>
+      </div>
+    </div>
+
+    <div class="strip-label">12-month crowd almanac</div>
+    <div class="ticket-strip" id="ticketStrip">
+      <div class="stub"><div class="m">…</div></div>
+    </div>
+    <div class="outlook-note" id="outlookNote"></div>
+  </section>
+
+  <footer>
+    <div class="section-head" style="margin-top:0;">
+      <h2 style="font-size:16px;">System status</h2>
+      <span class="hint">Live from the API</span>
+    </div>
+    <div class="board" id="board">
+      <div class="board-cell"><div class="k">Model accuracy</div><div class="v" id="mAccuracy">—</div></div>
+      <div class="board-cell"><div class="k">Error rate</div><div class="v" id="mError">—</div></div>
+      <div class="board-cell"><div class="k">Places covered</div><div class="v" id="mPlaces">—</div></div>
+      <div class="board-cell"><div class="k">Cache hit rate</div><div class="v" id="mCache">—</div></div>
+      <div class="board-cell"><div class="k">API uptime</div><div class="v small" id="mUptime">—</div></div>
+    </div>
+    <div class="credit">Crowd Almanac — built on a LightGBM crowd-classification model, served via FastAPI.</div>
+  </footer>
+
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const MONTH_FULL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const state = { currentPlace: null, currentMonth: new Date().getMonth() + 1 };
+
+  const $ = (id) => document.getElementById(id);
+
+  async function api(path){
+    const res = await fetch(path);
+    if(!res.ok){
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.detail || `Request failed (${res.status})`);
+    }
+    return res.json();
+  }
+
+  // ---------------------------------------------------------------
+  // Health check
+  // ---------------------------------------------------------------
+  async function checkHealth(){
+    const dot = $("statusDot"), text = $("statusText");
+    try{
+      const h = await api("/health");
+      if(h.model_loaded){
+        dot.className = "status-dot ok";
+        text.textContent = "Model online";
+      } else {
+        dot.className = "status-dot";
+        text.textContent = "Starting up…";
+      }
+    } catch(e){
+      dot.className = "status-dot down";
+      text.textContent = "API unreachable";
+    }
+  }
+
+  // ---------------------------------------------------------------
+  // Top places grid
+  // ---------------------------------------------------------------
+  async function loadTopPlaces(){
+    const grid = $("topGrid");
+    try{
+      const data = await api("/places/top?n=12");
+      if(!data.places.length){
+        grid.innerHTML = `<div class="state-msg"><b>No places yet</b>Train the model first, then refresh.</div>`;
+        return;
+      }
+      grid.innerHTML = "";
+      data.places.forEach(p => grid.appendChild(placeCard(p)));
+    } catch(e){
+      grid.innerHTML = `<div class="state-msg"><b>Can't reach the API</b>Start the backend with <code>uvicorn app.main:app --reload</code> and refresh this page.</div>`;
+    }
+  }
+
+  function placeCard(p){
+    const card = document.createElement("button");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="cat">${escapeHtml(p.category)}</div>
+      <div class="name">${escapeHtml(p.place_name)}</div>
+      <div class="state">${escapeHtml(p.state)}</div>
+      <div class="pop-bar"><span style="width:${Math.round(p.popularity_percentile*100)}%"></span></div>
+    `;
+    card.addEventListener("click", () => openPlace(p.place_name));
+    return card;
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  }
+
+  // ---------------------------------------------------------------
+  // Autocomplete search
+  // ---------------------------------------------------------------
+  let searchDebounce = null;
+  const input = $("searchInput"), ac = $("autocomplete");
+
+  input.addEventListener("input", () => {
+    clearTimeout(searchDebounce);
+    const q = input.value.trim();
+    if(q.length < 2){ ac.classList.remove("open"); return; }
+    searchDebounce = setTimeout(() => runSearch(q), 220);
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if(e.key === "Enter"){
+      e.preventDefault();
+      const q = input.value.trim();
+      if(q) runSearch(q, true);
+    }
+    if(e.key === "Escape"){ ac.classList.remove("open"); }
+  });
+
+  $("searchBtn").addEventListener("click", () => {
+    const q = input.value.trim();
+    if(q) runSearch(q, true);
+  });
+
+  document.addEventListener("click", (e) => {
+    if(!ac.contains(e.target) && e.target !== input) ac.classList.remove("open");
+  });
+
+  async function runSearch(q, pickFirst){
+    try{
+      const data = await api(`/places/search?q=${encodeURIComponent(q)}&limit=8`);
+      if(pickFirst && data.places.length){
+        ac.classList.remove("open");
+        openPlace(data.places[0].place_name);
+        return;
+      }
+      if(!data.places.length){
+        ac.innerHTML = `<div class="ac-item"><span class="ac-name">No matches for “${escapeHtml(q)}”</span></div>`;
+        ac.classList.add("open");
+        return;
+      }
+      ac.innerHTML = data.places.map(p => `
+        <div class="ac-item" data-name="${escapeHtml(p.place_name)}">
+          <span class="ac-name">${escapeHtml(p.place_name)}</span>
+          <span class="ac-meta">${escapeHtml(p.state)}</span>
+        </div>`).join("");
+      ac.classList.add("open");
+      ac.querySelectorAll(".ac-item[data-name]").forEach(el => {
+        el.addEventListener("click", () => {
+          ac.classList.remove("open");
+          openPlace(el.getAttribute("data-name"));
+        });
+      });
+    } catch(e){
+      ac.innerHTML = `<div class="ac-item"><span class="ac-name">Search unavailable right now</span></div>`;
+      ac.classList.add("open");
+    }
+  }
+
+  // ---------------------------------------------------------------
+  // Detail panel
+  // ---------------------------------------------------------------
+  const panel = $("panel");
+  $("closePanel").addEventListener("click", () => {
+    panel.classList.remove("open");
+    state.currentPlace = null;
+  });
+
+  function buildMonthPicker(){
+    const wrap = $("monthPicker");
+    wrap.innerHTML = "";
+    MONTHS.forEach((label, i) => {
+      const btn = document.createElement("button");
+      btn.className = "month-btn" + (i + 1 === state.currentMonth ? " active" : "");
+      btn.textContent = label;
+      btn.addEventListener("click", () => {
+        state.currentMonth = i + 1;
+        wrap.querySelectorAll(".month-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        loadPrediction();
+      });
+      wrap.appendChild(btn);
+    });
+  }
+
+  async function openPlace(name){
+    state.currentPlace = name;
+    input.value = "";
+    $("panelName").textContent = name;
+    $("panelCat").textContent = "Loading…";
+    $("panelLoc").textContent = "";
+    buildMonthPicker();
+    panel.classList.add("open");
+    panel.scrollIntoView({ behavior: "smooth", block: "start" });
+    await loadPrediction();
+  }
+
+  async function loadPrediction(){
+    if(!state.currentPlace) return;
+    const row = $("resultRow");
+    row.style.display = "flex";
+    $("resultSummary").textContent = "Loading forecast…";
+    $("altList").innerHTML = "<li>Loading…</li>";
+    await planTrip();
+  }
+
+  async function planTrip(){
+    try{
+      const res = await fetch("/trip/plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ place_name: state.currentPlace, month: state.currentMonth }),
+      });
+      if(!res.ok){
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.detail || "Prediction failed");
+      }
+      const data = await res.json();
+      renderPrediction(data.prediction);
+      renderAlternatives(data.alternative_low_crowd_places);
+      renderTicketStrip(data.year_outlook);
+      $("panelCat").textContent = data.prediction.category;
+      $("panelLoc").textContent = data.prediction.state;
+    } catch(e){
+      $("resultSummary").textContent = e.message || "Couldn't load a forecast for this place.";
+      $("levelPill").innerHTML = "";
+      $("confidenceFill").style.width = "0%";
+      $("confidenceLabel").textContent = "";
+      $("altList").innerHTML = "<li>Unavailable</li>";
+    }
+  }
+
+  function renderPrediction(p){
+    $("levelPill").innerHTML = `
+      <span class="level-pill level-${p.predicted_crowd_level}">
+        <span class="dot"></span>${p.predicted_crowd_level} crowd
+      </span>`;
+    $("resultSummary").textContent = p.summary;
+    $("confidenceFill").style.width = `${Math.round(p.confidence * 100)}%`;
+    $("confidenceLabel").textContent = `${Math.round(p.confidence * 100)}% confidence — the model is ${p.confidence_word} about this.`;
+  }
+
+  function renderAlternatives(alts){
+    const list = $("altList");
+    if(!alts || !alts.length){
+      list.innerHTML = "<li>No lower-crowd alternatives found for this month.</li>";
+      return;
+    }
+    list.innerHTML = alts.map(a => `
+      <li>
+        <span>${escapeHtml(a.place_name)}</span>
+        <span class="alt-state">${escapeHtml(a.state)}</span>
+      </li>`).join("");
+  }
+
+  function renderTicketStrip(outlook){
+    const strip = $("ticketStrip");
+    strip.innerHTML = outlook.months.map(m => `
+      <div class="stub">
+        <div class="m">${MONTHS[m.month - 1]}</div>
+        <div class="chip ${m.predicted_crowd_level}">${m.predicted_crowd_level}</div>
+      </div>`).join("");
+
+    const note = $("outlookNote");
+    const quiet = outlook.quietest_months.length ? outlook.quietest_months.join(", ") : "none predicted";
+    const busy = outlook.busiest_months.length ? outlook.busiest_months.join(", ") : "none predicted";
+    note.innerHTML = `Quietest months: <b>${escapeHtml(quiet)}</b> &nbsp;·&nbsp; Busiest months: <b>${escapeHtml(busy)}</b>`;
+  }
+
+  // ---------------------------------------------------------------
+  // Footer status board
+  // ---------------------------------------------------------------
+  async function loadStatusBoard(){
+    try{
+      const info = await api("/model/info");
+      $("mAccuracy").textContent = `${Math.round(info.accuracy * 100)}%`;
+      $("mError").textContent = `${Math.round(info.error_rate * 100)}%`;
+      $("mPlaces").textContent = info.total_places;
+    } catch(e){
+      $("mAccuracy").textContent = "—";
+      $("mError").textContent = "—";
+      $("mPlaces").textContent = "—";
+    }
+    try{
+      const cache = await api("/cache/stats");
+      $("mCache").textContent = `${Math.round((cache.hit_rate || 0) * 100)}%`;
+    } catch(e){ $("mCache").textContent = "—"; }
+    try{
+      const metrics = await api("/metrics");
+      const secs = metrics.uptime_seconds || 0;
+      const mins = Math.floor(secs / 60);
+      $("mUptime").textContent = mins < 60 ? `${mins}m` : `${Math.floor(mins/60)}h ${mins%60}m`;
+    } catch(e){ $("mUptime").textContent = "—"; }
+  }
+
+  // ---------------------------------------------------------------
+  // Boot
+  // ---------------------------------------------------------------
+  checkHealth();
+  loadTopPlaces();
+  loadStatusBoard();
+  setInterval(checkHealth, 30000);
+  setInterval(loadStatusBoard, 30000);
+})();
+</script>
+</body>
+</html>
