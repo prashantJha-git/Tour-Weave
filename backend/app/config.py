@@ -6,11 +6,12 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ┌── API METADATA ───────────────────────────────────────────────────┐
-API_TITLE = "Tourism Crowd Prediction API"
+API_TITLE = "Tour-Weave Crowd Intelligence API"
 API_VERSION = "1.0.0"
 API_DESCRIPTION = (
-    "Predicts monthly crowd levels for Indian tourist places, recommends "
-    "places to visit, and plans trips around low-crowd windows."
+    "Tour-Weave's backend: predicts monthly crowd levels for Indian tourist "
+    "places, recommends places to visit, forecasts weather, and plans trips "
+    "around low-crowd windows. Consumed by the Tour-Weave Vite/React frontend."
 )
 
 # ┌── CORS ────────────────────────────────────────────────────────────┐

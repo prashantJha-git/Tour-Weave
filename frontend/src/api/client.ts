@@ -13,16 +13,60 @@ class ApiError extends Error {
   }
 }
 
+// ---- GET de-duplication + short cache ----
+// Several components independently ask for overlapping data on mount
+// (e.g. App.tsx's top-20 destinations overlap RecommendedPlaces.tsx's
+// top-8), and React StrictMode double-fires every effect in dev on top
+// of that. Without this, a single page load can fire 50+ near-identical
+// /predict calls and blow through the backend's rate limit in seconds.
+// This makes concurrent identical GETs share one network call, and
+// caches the result briefly so remounts/re-renders don't refetch.
+const CACHE_TTL_MS = 60_000;
+const inFlight = new Map<string, Promise<any>>();
+const cache = new Map<string, { value: any; expiresAt: number }>();
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
-    ...init,
-  });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new ApiError(res.status, body.detail || `Request failed: ${res.status}`);
+  const isGet = !init || !init.method || init.method === 'GET';
+  const key = `${(init?.method || 'GET')}:${path}`;
+
+  if (isGet) {
+    const cached = cache.get(key);
+    if (cached && cached.expiresAt > Date.now()) {
+      return cached.value as T;
+    }
+    const pending = inFlight.get(key);
+    if (pending) {
+      return pending as Promise<T>;
+    }
   }
-  return res.json() as Promise<T>;
+
+  const doFetch = async (): Promise<T> => {
+    const res = await fetch(`${BASE_URL}${path}`, {
+      headers: { 'Content-Type': 'application/json' },
+      ...init,
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new ApiError(res.status, body.detail || `Request failed: ${res.status}`);
+    }
+    return res.json() as Promise<T>;
+  };
+
+  if (!isGet) {
+    return doFetch();
+  }
+
+  const promise = doFetch()
+    .then((value) => {
+      cache.set(key, { value, expiresAt: Date.now() + CACHE_TTL_MS });
+      return value;
+    })
+    .finally(() => {
+      inFlight.delete(key);
+    });
+
+  inFlight.set(key, promise);
+  return promise;
 }
 
 // ---- Backend response shapes (mirrors app/schemas.py) ----
@@ -32,6 +76,15 @@ export interface PlaceSummary {
   category: string;
   state: string;
   popularity_percentile: number;
+}
+
+export interface ModelInfo {
+  accuracy: number;
+  error_rate: number;
+  macro_f1: number;
+  features_used: string[];
+  trained_classes: string[];
+  total_places: number;
 }
 
 export interface CrowdPrediction {
@@ -98,6 +151,7 @@ export const api = {
     request<CrowdPrediction>(`/predict?place=${encodeURIComponent(place)}&month=${month}`),
   liveWeather: (place: string) => request<LiveWeather>(`/weather/live?place=${encodeURIComponent(place)}`),
   health: () => request<{ status: string; model_loaded: boolean }>('/health'),
+  modelInfo: () => request<ModelInfo>('/model/info'),
 
   // ---- Weather ML (multi-day XGBoost forecast) ----
   weatherForecastLocations: () => request<WeatherMLLocationsResponse>('/weather/forecast/locations'),

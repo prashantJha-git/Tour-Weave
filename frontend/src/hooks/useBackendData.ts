@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { api, WeatherMLForecastDay } from '../api/client';
+import { api, PlaceSummary, WeatherMLForecastDay } from '../api/client';
 import { toCityWeatherData, toCrowdIntelligenceData } from '../api/adapters';
 import { CityWeatherData, CrowdIntelligenceData, Destination } from '../types';
 import { toDestination } from '../api/adapters';
@@ -96,6 +96,49 @@ export function useRecommendedDestinations(n = 8) {
   }, [n]);
 
   return { destinations, loading };
+}
+
+/** Real, live model accuracy from the trained crowd model (backend
+ * /model/info, sourced from models/crowd_model_metrics.json) -- replaces
+ * any hardcoded "94.8% accuracy"-style marketing copy with the actual
+ * holdout metric the last training run produced. Null while loading or
+ * if the backend/metrics file isn't available. */
+export function useModelInfo() {
+  const [info, setInfo] = useState<{ accuracyPct: number; totalPlaces: number } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    api.modelInfo()
+      .then((res) => !cancelled && setInfo({
+        accuracyPct: Math.round(res.accuracy * 1000) / 10,
+        totalPlaces: res.total_places,
+      }))
+      .catch(() => !cancelled && setInfo(null));
+    return () => { cancelled = true; };
+  }, []);
+
+  return info;
+}
+
+/** All real places the backend knows about (name/category/state/popularity),
+ * fetched once and cached for the session. Powers the destination search
+ * dropdown so it lists every place the model actually covers instead of a
+ * hardcoded shortlist. Falls back to an empty list if the backend is
+ * unreachable -- callers should keep their own static fallback for that case. */
+export function useAllPlaces() {
+  const [places, setPlaces] = useState<PlaceSummary[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    api.topPlaces(200) // effectively "all" -- backend caps at 200
+      .then((res) => !cancelled && setPlaces(res.places))
+      .catch(() => !cancelled && setPlaces([]))
+      .finally(() => !cancelled && setLoading(false));
+    return () => { cancelled = true; };
+  }, []);
+
+  return { places, loading };
 }
 
 /** Multi-day XGBoost weather forecast (backend `weather_ml/`) for one of

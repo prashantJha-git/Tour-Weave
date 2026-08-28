@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
 import { ValueProps } from './components/ValueProps';
@@ -21,13 +21,30 @@ import { ImageLightboxModal } from './components/ImageLightboxModal';
 
 import { Destination, TransportMode, CrowdPreference, HeritageGalleryItem } from './types';
 import { POPULAR_DESTINATIONS } from './data/mockData';
+import { useRecommendedDestinations } from './hooks/useBackendData';
 
 export default function App() {
-  // Saved places state (pre-populated with 2 authentic Indian destinations for immediate delight)
+  // Live destination pool from the Tour-Weave backend (real places + real
+  // crowd predictions). Falls back to the bundled mock set only if the
+  // backend is unreachable, so the app never renders empty.
+  const { destinations: liveDestinations } = useRecommendedDestinations(20);
+  const destinationPool = liveDestinations && liveDestinations.length > 0 ? liveDestinations : POPULAR_DESTINATIONS;
+
+  // Saved places state (pre-populated with 2 destinations for immediate delight)
   const [savedPlaces, setSavedPlaces] = useState<Destination[]>([
     POPULAR_DESTINATIONS[0], // Udaipur
     POPULAR_DESTINATIONS[1], // Munnar
   ]);
+
+  // Once live backend destinations arrive, swap the starter wishlist over to
+  // real, backend-predicted destinations instead of the static mock pair.
+  const hasSwappedToLive = useRef(false);
+  useEffect(() => {
+    if (!hasSwappedToLive.current && liveDestinations && liveDestinations.length >= 2) {
+      hasSwappedToLive.current = true;
+      setSavedPlaces([liveDestinations[0], liveDestinations[1]]);
+    }
+  }, [liveDestinations]);
 
   // Modal and Drawer States
   const [isSavedDrawerOpen, setIsSavedDrawerOpen] = useState(false);
@@ -90,7 +107,7 @@ export default function App() {
 
   const handleViewDestinationDetail = (locationOrCity: string, destinationId?: string) => {
     if (destinationId) {
-      const byId = POPULAR_DESTINATIONS.find((d) => d.id === destinationId);
+      const byId = destinationPool.find((d) => d.id === destinationId) ?? POPULAR_DESTINATIONS.find((d) => d.id === destinationId);
       if (byId) {
         setSelectedDestinationDetail(byId);
         return;
@@ -99,6 +116,18 @@ export default function App() {
 
     const raw = locationOrCity.toLowerCase();
     const cityName = locationOrCity.split(',')[0].trim().toLowerCase();
+
+    // Try the live backend pool first (real predictions), then fall back
+    // to the curated mock set for cities the current live pool doesn't cover.
+    const liveMatch = destinationPool.find((d) => {
+      const dCity = d.name.split(',')[0].trim().toLowerCase();
+      return dCity === cityName || d.name.toLowerCase().includes(cityName) || cityName.includes(dCity);
+    });
+    if (liveMatch) {
+      setSelectedDestinationDetail(liveMatch);
+      return;
+    }
+
     const matched = POPULAR_DESTINATIONS.find((d) => {
       const dCity = d.name.split(',')[0].trim().toLowerCase();
       return (

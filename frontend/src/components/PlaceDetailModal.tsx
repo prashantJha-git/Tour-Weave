@@ -205,7 +205,7 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({
             </div>
             <div>
               <span className="font-bold text-[10px] uppercase tracking-widest block text-[#1D3D33]">
-                Tour-Weaver Machine Learning Travel Advisory
+                Tour-Weave Machine Learning Travel Advisory
               </span>
               <p className="text-xs text-[#1D3D33]/80 mt-0.5 leading-relaxed">
                 {destination.aiTravelTip}

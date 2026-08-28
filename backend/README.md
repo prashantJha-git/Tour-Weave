@@ -1,4 +1,4 @@
-# Crowd Almanac — Tourism Crowd Prediction & Place Recommendation
+# Tour-Weave Backend — Crowd Prediction & Place Recommendation
 
 A two-model ML system that helps travelers plan visits to Indian tourist attractions: it predicts monthly crowd levels, recommends places to go, and turns both into a single "plan my trip" flow, served behind a FastAPI backend with a lightweight web dashboard.
 

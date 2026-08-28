@@ -83,13 +83,39 @@ export function toCrowdIntelligenceData(place: string, prediction: CrowdPredicti
     status: level === 'Low' ? 'Quiet — Great Time to Visit' : level === 'Medium' ? 'Moderate Footfall' : 'Busy — Expect Queues',
     statusColor,
     confidenceScore: Math.round(prediction.confidence * 1000) / 10,
-    modelType: 'LightGBM (holdout accuracy 98.1%)',
+    modelType: 'LightGBM Crowd Model', // accuracy % is shown live elsewhere from /model/info, not hardcoded here
     peakHours: '12PM – 3PM', // heuristic, not a separate hourly model
     bestHours: hourlyTrends.find(h => h.isRecommended)?.hour ? `Before ${hourlyTrends.find(h => h.isRecommended)!.hour}` : 'Early Morning',
     estimatedQueueTimeMin: Math.max(5, Math.round(densityScore / 3)),
     liveFootfallRadar: prediction.summary,
     hourlyTrends,
   };
+}
+
+// Per-category base cost (INR, per person) for a short trip -- a simple,
+// transparent, DETERMINISTIC heuristic (not random, not backend-modeled --
+// the backend has no pricing model). Same place + same backend data always
+// yields the same number, and it scales with real signals the backend does
+// provide: category and how popular/in-demand the place is.
+const CATEGORY_BASE_PRICE_INR: Record<string, number> = {
+  Heritage: 4500, Spiritual: 3000, Nature: 5500, Adventure: 7000, Coastal: 6000,
+};
+
+/** Deterministic starting price derived from real backend fields
+ * (category + popularity_percentile). No randomness: re-running this on
+ * the same PlaceSummary always produces the same number. */
+function estimatePriceInr(place: PlaceSummary): number {
+  const base = CATEGORY_BASE_PRICE_INR[place.category] ?? 4000;
+  // More popular / in-demand places command a premium, up to +60%.
+  const demandMultiplier = 1 + Math.min(0.6, place.popularity_percentile * 0.6);
+  const raw = base * demandMultiplier;
+  return Math.round(raw / 100) * 100; // round to nearest ₹100
+}
+
+/** Deterministic 3.9–4.9 rating derived from the real popularity percentile
+ * the backend returns, instead of a fixed placeholder for every place. */
+function estimateRating(place: PlaceSummary): number {
+  return Math.round((3.9 + place.popularity_percentile * 1.0) * 10) / 10;
 }
 
 export function toDestination(place: PlaceSummary, prediction: CrowdPrediction | null): Destination {
@@ -109,11 +135,11 @@ export function toDestination(place: PlaceSummary, prediction: CrowdPrediction |
       : 'Heritage',
     image: `https://source.unsplash.com/800x600/?india,${encodeURIComponent(place.category)}`,
     gallery: [],
-    startingPriceInr: 4999, // not modeled by the backend — placeholder for the booking-style UI
+    startingPriceInr: estimatePriceInr(place), // deterministic estimate from category + real popularity data
     aiMatchPercentage: Math.round(place.popularity_percentile * 100),
     crowdLevel: level,
     crowdDensity: density,
-    rating: 4.5,
+    rating: estimateRating(place), // deterministic, derived from real popularity data
     reviewsCount: Math.round(place.popularity_percentile * 2000),
     idealDuration: '2 - 3 Days',
     description: prediction?.summary || `${place.place_name} is one of the most popular ${place.category.toLowerCase()} destinations in ${place.state}.`,

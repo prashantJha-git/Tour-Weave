@@ -1,30 +1,35 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Tour-Weave Frontend
 
-# RUN and DEPLOY Your AI Studio App
+React + Vite + TypeScript UI for Tour-Weave. Talks to the Tour-Weave
+FastAPI backend (`../backend`) over `VITE_API_BASE_URL` — see
+`src/api/client.ts` for every request the app makes, and the root
+`README.md` for full setup and architecture.
 
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/c23b72b9-a195-4788-a246-7993b02680e4
-
-## LOCALHOST
-
-**PREREQUISITES:**  Node.js
+## Run locally
 
 ```bash
-# 1. Install dependencies
 npm install
+npm run dev        # http://localhost:5173
+```
 
-# 2. Set your Gemini API key in .env.local
-#    GEMINI_API_KEY=your_api_key_here
+Requires the backend running at `http://localhost:8000` (see
+`../backend/README.md`), or set `VITE_API_BASE_URL` in `.env` to point
+elsewhere.
 
-# 3. Start Vite development server
-npm run dev
+## Scripts
 
-# Typecheck and build production bundle
-npm run build
+- `npm run dev` — start the dev server
+- `npm run build` — type-check and build a production bundle to `dist/`
+- `npm run preview` — preview the production build locally
+- `npm run lint` — TypeScript type-check only
 
-# Preview production build locally
-npm run preview
+## Structure
+
+```
+src/
+├── api/          client.ts (fetch wrapper) + adapters.ts (backend -> UI shapes)
+├── hooks/        useBackendData.ts -- all live-data hooks used by components
+├── components/   UI sections, modals, and drawers
+├── data/         bundled fallback/sample content (used only if the backend is unreachable)
+└── App.tsx       top-level composition and state
 ```

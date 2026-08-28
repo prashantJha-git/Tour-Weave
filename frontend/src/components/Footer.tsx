@@ -22,7 +22,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectGalleryItem }) => {
                 <Compass className="w-5 h-5" />
               </div>
               <span className="text-2xl font-bold font-serif text-white tracking-tight">
-                Tour-Weaver<span className="text-[#FBC02D]">.ai</span>
+                tour<span className="text-[#FBC02D]">-weave</span>
               </span>
             </div>
 
@@ -100,11 +100,11 @@ export const Footer: React.FC<FooterProps> = ({ onSelectGalleryItem }) => {
               </div>
               <div className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-[#FBC02D] shrink-0" />
-                <span>+91 1800-TOUR-WEAVER (24x7 Helpline)</span>
+                <span>+91 1800-TOUR-WEAVE (24x7 Helpline)</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-[#FBC02D] shrink-0" />
-                <span>concierge@tourweaver.in</span>
+                <span>concierge@tourweave.in</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Clock className="w-4 h-4 text-[#FBC02D] shrink-0" />
@@ -157,7 +157,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectGalleryItem }) => {
 
         {/* Bottom copyright & attribution */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-stone-400 gap-4">
-          <p>© {new Date().getFullYear()} Tour-Weaver. Crafted with pride for Indian Tourism.</p>
+          <p>© {new Date().getFullYear()} Tour-Weave Bharat Ltd. Crafted with pride for Indian Tourism.</p>
           <div className="flex items-center gap-6">
             <a href="#privacy" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="#terms" className="hover:text-white transition-colors">Terms of Service</a>

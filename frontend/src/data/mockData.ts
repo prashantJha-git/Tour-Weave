@@ -437,7 +437,7 @@ export const POPULAR_DESTINATIONS: Destination[] = [
     rating: 4.9,
     reviewsCount: 1420,
     idealDuration: '3 - 4 Days',
-    description: 'Immerse in the regal grandeur of the City of Lakes. Tour-Weaver through the intricate mirrored courtyards of the City Palace and embark on a golden hour sunset cruise across Lake Pichola.',
+    description: 'Immerse in the regal grandeur of the City of Lakes. Wander through the intricate mirrored courtyards of the City Palace and embark on a golden hour sunset cruise across Lake Pichola.',
     highlights: ['Lake Pichola Boat Cruise', 'City Palace Royal Quarters', 'Saheliyon-ki-Bari Fountains', 'Rooftop Rajasthani Dining'],
     aiTravelTip: 'AI predicts Lake Pichola boat tickets have 45% less queue between 8:30 AM - 10:00 AM.',
     bestMonths: 'October - March',
@@ -657,7 +657,7 @@ export const MOCK_TESTIMONIALS: Testimonial[] = [
     rating: 5,
     date: 'February 2026',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-    review: 'The crowd prediction algorithm was mind-blowing! Tour-Weaver directed me to Thiksey Monastery at 6:15 AM—I had the morning prayer chanting almost entirely to myself before the tour buses arrived. Truly spiritual and seamless.',
+    review: 'The crowd prediction algorithm was mind-blowing! Tour-Weave directed me to Thiksey Monastery at 6:15 AM—I had the morning prayer chanting almost entirely to myself before the tour buses arrived. Truly spiritual and seamless.',
     verifiedRoute: 'Vistara Flight + High-Altitude AI Route Planner'
   },
   {
@@ -750,7 +750,7 @@ export const HERITAGE_GALLERY: HeritageGalleryItem[] = [
   },
   {
     id: 'gal-4',
-    title: 'Goan Coastal Tour-Weaver Van',
+    title: 'Goan Coastal Wanderer Van',
     location: 'Goa, Coastal India',
     image: 'https://images.unsplash.com/photo-1561361513-2d000a50f0dc?auto=format&fit=crop&w=1000&q=80',
     description: 'Iconic retro travel van parked along the golden sands and swaying palms of South Goa beaches.',
@@ -882,7 +882,7 @@ export const SAMPLE_GENERATED_ITINERARIES: { [key: string]: GeneratedItinerary }
             description: 'Handpicked lac bangles, mojaris, and kundan jewelry from multigenerational shopkeepers.',
             crowdPrediction: '🟡 Moderate',
             modeOfTransit: 'Heritage Walk',
-            smartTip: 'Tour-Weaver verified merchants ensure authentic gemstones and hallmark certifications.'
+            smartTip: 'Tour-Weave verified merchants ensure authentic gemstones and hallmark certifications.'
           }
         ]
       }
@@ -1129,7 +1129,7 @@ export const SAMPLE_GENERATED_ITINERARIES: { [key: string]: GeneratedItinerary }
             time: '08:30 AM',
             title: 'Fontainhas Latin Quarter Walking Tour',
             location: 'Panjim Old Quarter',
-            description: 'Tour-Weaver pastel yellow, indigo, and terracotta tiled 18th-century Portuguese heritage villas with wrought-iron balconies.',
+            description: 'Wander pastel yellow, indigo, and terracotta tiled 18th-century Portuguese heritage villas with wrought-iron balconies.',
             crowdPrediction: '🟢 Low Crowd',
             modeOfTransit: 'Heritage Walk',
             smartTip: 'Try freshly baked Bebinca and Poi bread from 100-year-old traditional bakeries.'

@@ -6,8 +6,6 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 
 # Make the project root importable so we can reuse the existing,
 # battle-tested prediction/recommendation modules instead of
@@ -390,16 +388,18 @@ def clear_cache():
 
 
 # ┌───────────────────────────────────────────────────────────────────┐
-# │  STATIC FRONTEND · serves frontend/index.html at "/"              │
+# │  API ROOT · this backend is a pure JSON API. The UI lives in       │
+# │  ../frontend (Vite + React), served by its own dev server / static │
+# │  host and talking to this API over VITE_API_BASE_URL. See the      │
+# │  root README for the single-command way to run both together.     │
 # └───────────────────────────────────────────────────────────────────┘
 
-FRONTEND_DIR = BASE_DIR / "frontend"
-if FRONTEND_DIR.exists():
-    app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
-
-    @app.get("/", include_in_schema=False)
-    def dashboard():
-        index_path = FRONTEND_DIR / "index.html"
-        if index_path.exists():
-            return FileResponse(index_path)
-        raise HTTPException(status_code=404, detail="Dashboard not built yet.")
+@app.get("/", include_in_schema=False)
+def root():
+    return {
+        "service": config.API_TITLE,
+        "version": config.API_VERSION,
+        "docs": "/docs",
+        "frontend": "This backend no longer serves the UI directly -- run the Tour-Weave "
+                    "Vite frontend separately (see /frontend) and point VITE_API_BASE_URL at this server.",
+    }

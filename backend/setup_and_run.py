@@ -143,7 +143,8 @@ def serve_api(host: str = "0.0.0.0", port: int = 8000) -> bool:
     
     print_success("Model artifacts found")
     print(f"\n{Colors.OKGREEN}{Colors.BOLD}Starting API server...{Colors.ENDC}")
-    print(f"  Dashboard: {Colors.OKBLUE}http://localhost:{port}{Colors.ENDC}")
+    print(f"  API root:  {Colors.OKBLUE}http://localhost:{port}{Colors.ENDC}")
+    print(f"  Frontend:  {Colors.OKBLUE}http://localhost:5173{Colors.ENDC} (run separately -- see root README / run.sh)")
     print(f"  Swagger:   {Colors.OKBLUE}http://localhost:{port}/docs{Colors.ENDC}")
     print(f"  ReDoc:     {Colors.OKBLUE}http://localhost:{port}/redoc{Colors.ENDC}")
     print(f"\n{Colors.WARNING}Press Ctrl+C to stop{Colors.ENDC}\n")
@@ -175,7 +176,7 @@ def serve_api(host: str = "0.0.0.0", port: int = 8000) -> bool:
 
 def run_all() -> bool:
     #Run the complete pipeline
-    print_header("🌏 Crowd Almanac Setup & Training")
+    print_header("🌏 Tour-Weave Backend Setup & Training")
     
     steps = [
         ("Dependencies", install_dependencies),
@@ -201,7 +202,7 @@ def run_all() -> bool:
 def show_help() -> None:
     #Display help message
     help_text = f"""
-{Colors.HEADER}{Colors.BOLD}Crowd Almanac Setup & Run{Colors.ENDC}
+{Colors.HEADER}{Colors.BOLD}Tour-Weave Backend Setup & Run{Colors.ENDC}
 
 {Colors.BOLD}Usage:{Colors.ENDC}
   python setup_and_run.py <command>

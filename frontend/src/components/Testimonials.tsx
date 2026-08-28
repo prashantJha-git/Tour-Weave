@@ -138,7 +138,7 @@ export const Testimonials: React.FC = () => {
               What Our Travelers Say
             </h2>
             <p className="text-[#1D3D33]/70 text-sm mt-1">
-              Real journeys across Bharat powered by Tour-Weaver crowd avoidance and transit synchrony.
+              Real journeys across Bharat powered by Tour-Weave crowd avoidance and transit synchrony.
             </p>
           </div>
 

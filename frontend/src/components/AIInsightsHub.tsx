@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Sparkles,
   CloudSun,
@@ -10,15 +10,49 @@ import {
   Info,
   ShieldCheck,
   AlertTriangle,
-  SunMedium
+  SunMedium,
+  Search,
+  MapPin,
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { usePlaceInsights, useTopPlaceNames } from '../hooks/useBackendData';
+import { usePlaceInsights, useTopPlaceNames, useAllPlaces } from '../hooks/useBackendData';
 
 export const AIInsightsHub: React.FC = () => {
   const cityList = useTopPlaceNames(6);
+  const { places: allPlaces } = useAllPlaces(); // all 138 backend-known places, for the search box below
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [selectedDayIndex, setSelectedDayIndex] = useState<number>(0);
+
+  // ---- Destination search box (all 138 places, not just the top 6 tabs) ----
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setShowSearchDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const searchResults = (searchQuery.trim()
+    ? allPlaces.filter((p) =>
+        p.place_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.category.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : allPlaces
+  ).slice(0, 8);
+
+  const handleSelectPlace = (placeName: string) => {
+    setSelectedCity(placeName);
+    setSelectedDayIndex(0);
+    setSearchQuery('');
+    setShowSearchDropdown(false);
+  };
 
   // Once the real place list arrives from the backend, default to the first one.
   React.useEffect(() => {
@@ -69,6 +103,48 @@ export const AIInsightsHub: React.FC = () => {
             </p>
           </div>
 
+          {/* Destination Search + Quick Tabs (right side, stacked) */}
+          <div className="flex flex-col gap-3 w-full md:w-auto md:items-end">
+          {/* Destination Search — pick from all 138 backend-known places */}
+          <div ref={searchContainerRef} className="relative w-full md:w-72">
+            <div className="relative">
+              <Search className="w-4 h-4 text-[#1D3D33]/40 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setShowSearchDropdown(true);
+                }}
+                onFocus={() => setShowSearchDropdown(true)}
+                placeholder={`Search ${allPlaces.length || 138} destinations…`}
+                className="w-full pl-9 pr-3 py-2.5 rounded-xl text-sm bg-white border border-[#1D3D33]/15 text-[#1D3D33] placeholder:text-[#1D3D33]/40 focus:outline-none focus:ring-2 focus:ring-[#1D3D33]/20 shadow-sm"
+              />
+            </div>
+
+            {showSearchDropdown && (
+              <div className="absolute z-20 mt-2 w-full bg-white rounded-xl border border-[#1D3D33]/10 shadow-lg max-h-72 overflow-y-auto">
+                {searchResults.length > 0 ? (
+                  searchResults.map((p) => (
+                    <button
+                      key={p.place_name}
+                      onClick={() => handleSelectPlace(p.place_name)}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-[#F8F1E9] transition-colors cursor-pointer"
+                    >
+                      <MapPin className="w-3.5 h-3.5 text-[#1D3D33]/40 shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-[#1D3D33] truncate">{p.place_name}</p>
+                        <p className="text-[11px] text-[#1D3D33]/50 truncate">{p.state} • {p.category}</p>
+                      </div>
+                    </button>
+                  ))
+                ) : (
+                  <p className="px-4 py-3 text-xs text-[#1D3D33]/50">No matching destination.</p>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* City Selection Tabs */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
             {cityList.map((city) => (
@@ -87,6 +163,7 @@ export const AIInsightsHub: React.FC = () => {
                 {city}
               </button>
             ))}
+          </div>
           </div>
         </motion.div>
 
@@ -353,7 +430,7 @@ export const AIInsightsHub: React.FC = () => {
                 <span>Best Slot: <strong className="text-[#1D3D33]">{crowd.bestHours}</strong></span>
               </div>
               <span className="font-mono text-[10px] bg-[#1D3D33]/5 px-2 py-0.5 rounded text-[#1D3D33]">
-                LightGBM + Ticket Telemetry
+                {crowd.modelType}
               </span>
             </div>
 

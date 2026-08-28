@@ -12,17 +12,37 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { TransportMode, CrowdPreference } from '../types';
+import { useAllPlaces, useModelInfo } from '../hooks/useBackendData';
 
 interface SearchCardProps {
   onGenerate: (destination: string, transport: TransportMode, crowdPref: CrowdPreference, dateRange: string) => void;
 }
 
+// Static fallback shown only while the backend list is loading, or if the
+// backend is unreachable -- the moment /places/top responds, the dropdown
+// switches to the real, full place list (138+ places) from Tour-Weave's API.
+const FALLBACK_DESTINATIONS = [
+  { city: 'Jaipur', state: 'Rajasthan', type: 'Heritage' },
+  { city: 'Varanasi', state: 'Uttar Pradesh', type: 'Spiritual' },
+  { city: 'Munnar', state: 'Kerala', type: 'Nature' },
+  { city: 'Udaipur', state: 'Rajasthan', type: 'Heritage' },
+  { city: 'Goa', state: 'Goa', type: 'Coastal' },
+  { city: 'Hampi', state: 'Karnataka', type: 'Heritage' },
+];
+
 export const SearchCard: React.FC<SearchCardProps> = ({ onGenerate }) => {
+  const { places: backendPlaces, loading: placesLoading } = useAllPlaces();
+  const modelInfo = useModelInfo();
+  const destinationOptions = backendPlaces.length > 0
+    ? backendPlaces.map(p => ({ city: p.place_name, state: p.state, type: p.category }))
+    : FALLBACK_DESTINATIONS;
+
   const [destination, setDestination] = useState('Jaipur');
+  const [destFilter, setDestFilter] = useState('');
   const [transport, setTransport] = useState<TransportMode>('Train (Vande Bharat)');
   const [crowdPref, setCrowdPref] = useState<CrowdPreference>('Avoid Crowds');
   const [dates, setDates] = useState('Oct 14 - Oct 17, 2026');
-  
+
   const [showDestDropdown, setShowDestDropdown] = useState(false);
   const [showTransportDropdown, setShowTransportDropdown] = useState(false);
   const [showCrowdDropdown, setShowCrowdDropdown] = useState(false);
@@ -43,16 +63,13 @@ export const SearchCard: React.FC<SearchCardProps> = ({ onGenerate }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const popularDestinations = [
-    { city: 'Jaipur', state: 'Rajasthan', type: 'Royal Heritage' },
-    { city: 'Varanasi', state: 'Uttar Pradesh', type: 'Spiritual Ghats' },
-    { city: 'Munnar', state: 'Kerala', type: 'Tea Highlands' },
-    { city: 'Leh-Ladakh', state: 'Ladakh', type: 'High Altitude Lakes' },
-    { city: 'Udaipur', state: 'Rajasthan', type: 'Lakes & Palaces' },
-    { city: 'Goa', state: 'Goa', type: 'Coastal Serenity' },
-    { city: 'Hampi', state: 'Karnataka', type: 'UNESCO Boulder Ruins' },
-    { city: 'Rishikesh', state: 'Uttarakhand', type: 'Ganges & Yoga Haven' }
-  ];
+  const filteredDestinations = destFilter.trim()
+    ? destinationOptions.filter((d) =>
+        d.city.toLowerCase().includes(destFilter.toLowerCase()) ||
+        d.state.toLowerCase().includes(destFilter.toLowerCase()) ||
+        d.type.toLowerCase().includes(destFilter.toLowerCase())
+      )
+    : destinationOptions;
 
   const datePresets = [
     'Oct 14 - Oct 17, 2026 (3 Days • Festival Off-Peak)',
@@ -91,11 +108,13 @@ export const SearchCard: React.FC<SearchCardProps> = ({ onGenerate }) => {
               LightGBM AI Engine Active
             </span>
             <span className="hidden sm:inline text-stone-300">•</span>
-            <span className="hidden sm:inline font-medium text-xs text-[#1D3D33]/80">Real-time crowd telemetry & IRCTC/Air synchronization</span>
+            <span className="hidden sm:inline font-medium text-xs text-[#1D3D33]/80">
+              {modelInfo ? `${modelInfo.totalPlaces} live-modeled destinations across India` : 'Connecting to live crowd model…'}
+            </span>
           </div>
           <div className="flex items-center gap-1.5 text-xs font-semibold text-[#1D3D33]">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>94.8% Predictive Model Accuracy</span>
+            <span>{modelInfo ? `${modelInfo.accuracyPct}% Model Accuracy (live)` : 'Loading model accuracy…'}</span>
           </div>
         </div>
 
@@ -125,37 +144,59 @@ export const SearchCard: React.FC<SearchCardProps> = ({ onGenerate }) => {
               <ChevronDown className="w-4 h-4 text-[#1D3D33]/40 shrink-0" />
             </div>
 
-            {/* Destination Dropdown */}
+            {/* Destination Dropdown -- searchable combobox backed by the
+                live backend place list (falls back to a static shortlist
+                only while loading / if the API is unreachable). */}
             {showDestDropdown && (
-              <div className="absolute top-full left-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-[#1D3D33]/10 p-2 z-50 animate-in fade-in slide-in-from-top-2 max-h-72 overflow-y-auto">
-                <div className="px-3 py-1.5 text-[10px] font-bold text-[#1D3D33]/50 uppercase tracking-widest">
-                  Curated Indian Destinations
+              <div
+                className="absolute top-full left-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-[#1D3D33]/10 p-2 z-50 animate-in fade-in slide-in-from-top-2"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="relative mb-1.5">
+                  <Search className="w-3.5 h-3.5 text-[#1D3D33]/40 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    autoFocus
+                    type="text"
+                    value={destFilter}
+                    onChange={(e) => setDestFilter(e.target.value)}
+                    placeholder={placesLoading ? 'Loading places…' : `Search ${destinationOptions.length} destinations…`}
+                    className="w-full pl-8 pr-2 py-2 rounded-xl text-xs bg-[#FDF8F3] border border-[#1D3D33]/10 focus:outline-none focus:border-[#1D3D33]/30 text-[#1D3D33]"
+                  />
                 </div>
-                {popularDestinations.map((item) => (
-                  <button
-                    key={item.city}
-                    type="button"
-                    onClick={() => {
-                      setDestination(item.city);
-                      setShowDestDropdown(false);
-                    }}
-                    className={`w-full text-left p-2.5 rounded-xl text-xs flex items-center justify-between transition-colors ${
-                      destination === item.city
-                        ? 'bg-[#1D3D33] text-white'
-                        : 'hover:bg-[#FDF8F3] text-[#1D3D33]'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-bold text-sm">{item.city}</div>
-                      <div className={`text-[11px] ${destination === item.city ? 'text-stone-300' : 'text-[#1D3D33]/60'}`}>
-                        {item.state} • {item.type}
+                <div className="px-2 py-1 text-[10px] font-bold text-[#1D3D33]/50 uppercase tracking-widest">
+                  {backendPlaces.length > 0 ? 'Live Tour-Weave Destinations' : 'Curated Indian Destinations'}
+                </div>
+                <div className="max-h-64 overflow-y-auto">
+                  {filteredDestinations.length === 0 && (
+                    <div className="px-3 py-4 text-xs text-[#1D3D33]/50 text-center">No matches. Try another name.</div>
+                  )}
+                  {filteredDestinations.slice(0, 50).map((item) => (
+                    <button
+                      key={item.city}
+                      type="button"
+                      onClick={() => {
+                        setDestination(item.city);
+                        setShowDestDropdown(false);
+                        setDestFilter('');
+                      }}
+                      className={`w-full text-left p-2.5 rounded-xl text-xs flex items-center justify-between transition-colors ${
+                        destination === item.city
+                          ? 'bg-[#1D3D33] text-white'
+                          : 'hover:bg-[#FDF8F3] text-[#1D3D33]'
+                      }`}
+                    >
+                      <div>
+                        <div className="font-bold text-sm">{item.city}</div>
+                        <div className={`text-[11px] ${destination === item.city ? 'text-stone-300' : 'text-[#1D3D33]/60'}`}>
+                          {item.state} • {item.type}
+                        </div>
                       </div>
-                    </div>
-                    {destination === item.city && (
-                      <span className="text-xs text-[#FBC02D] font-bold">Selected</span>
-                    )}
-                  </button>
-                ))}
+                      {destination === item.city && (
+                        <span className="text-xs text-[#FBC02D] font-bold">Selected</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </div>

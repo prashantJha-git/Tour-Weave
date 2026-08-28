@@ -62,7 +62,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className={`text-2xl font-serif font-bold tracking-tight ${
                 isScrolled ? 'text-[#1D3D33]' : 'text-white'
               }`}>
-                Tour-Weaver<span className="text-[#FBC02D]">.ai</span>
+                tour<span className="text-[#FBC02D]">-weave</span>
               </span>
             </div>
             <span className={`block text-[10px] uppercase tracking-widest font-medium ${

@@ -3,6 +3,7 @@ import { ArrowRight, Sparkles } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { SearchCard } from './SearchCard';
 import { TransportMode, CrowdPreference } from '../types';
+import { useModelInfo } from '../hooks/useBackendData';
 
 const HERO_IMAGES = [
   "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=2000&q=85", // Taj Mahal
@@ -24,6 +25,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const containerRef = useRef<HTMLElement>(null);
+  const modelInfo = useModelInfo(); // live accuracy + place count from the trained model, not hardcoded copy
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -137,12 +139,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           >
             <div className="inline-flex flex-wrap items-center gap-4 sm:gap-6 px-4 py-2.5 rounded-2xl bg-black/35 backdrop-blur-md border border-white/15 text-xs text-stone-200 shadow-sm">
               <div>
-                <span className="font-bold text-white text-base leading-tight block">500+</span>
-                <p className="text-stone-300 text-[11px]">Heritage Sites Mapped</p>
+                <span className="font-bold text-white text-base leading-tight block">{modelInfo ? `${modelInfo.totalPlaces}+` : '…'}</span>
+                <p className="text-stone-300 text-[11px]">Places Mapped Live</p>
               </div>
               <div className="w-px h-7 bg-white/20" />
               <div>
-                <span className="font-bold text-[#FBC02D] text-base leading-tight block">94.8%</span>
+                <span className="font-bold text-[#FBC02D] text-base leading-tight block">{modelInfo ? `${modelInfo.accuracyPct}%` : '…'}</span>
                 <p className="text-stone-300 text-[11px]">Crowd Model Accuracy</p>
               </div>
               <div className="w-px h-7 bg-white/20" />

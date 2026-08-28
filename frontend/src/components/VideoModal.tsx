@@ -83,7 +83,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose }) => {
         <div className="p-4 bg-[#152e27] border-t border-white/10 flex items-center justify-between text-xs">
           <div className="flex items-center gap-1.5 text-stone-300">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>Curated by Ministry of Tourism & Tour-Weaver Geospatial Models</span>
+            <span>Curated by Ministry of Tourism & Tour-Weave Geospatial Models</span>
           </div>
           <button
             onClick={onClose}
