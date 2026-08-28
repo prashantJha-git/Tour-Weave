@@ -13,6 +13,22 @@ tour-weave/
 └── run.bat     One-click setup + run (Windows, double-click to launch)
 ```
 
+## Live Demo
+
+Tour-Weave is deployed and live — no local setup needed to try it:
+
+| What | Link |
+|---|---|
+| 🌐 App (frontend) | **https://tour-weave.vercel.app/** |
+| ⚙️ API (backend) | **https://tour-weave-1.onrender.com** |
+| 📘 Swagger UI | https://tour-weave-1.onrender.com/docs |
+| 📄 OpenAPI JSON | https://tour-weave-1.onrender.com/openapi.json |
+| 📖 ReDoc | https://tour-weave-1.onrender.com/redoc |
+
+> **Note:** the backend is on Render's free tier, so it spins down when
+> idle. The first request after a period of inactivity can take
+> 30–60s to wake it up — this is normal, not a bug.
+
 | Model | Tech | What it predicts |
 |---|---|---|
 | **Crowd Prediction** | LightGBM | Monthly crowd level (Low / Medium / High) for 1,100+ Indian tourist places, learned **per-place** relative to that place's own seasonal pattern — not a raw visitor-count cutoff |
@@ -24,7 +40,7 @@ real-time "what's it like there right now" conditions.
 
 ---
 
-## System Architecture
+## Architecture Design
 
 ```
                              ┌──────────────────────────────┐                             
@@ -188,15 +204,27 @@ pandas, joblib
 
 ## Deploying
 
-Backend and frontend deploy **independently**:
+Backend and frontend deploy **independently**. This is exactly how the
+live demo above is hosted:
+
+- **Backend → Render** (`https://tour-weave-1.onrender.com`) — runs
+  `uvicorn app.main:app` on Render's free web-service tier.
+  `CORS_ORIGINS` is set to the Vercel frontend URL so only that origin
+  can make requests.
+- **Frontend → Vercel** (`https://tour-weave.vercel.app`) — `npm run
+  build` in `frontend/` produces a static `frontend/dist/`, deployed
+  via Vercel. `VITE_API_BASE_URL` is set at build time to the Render
+  backend URL above.
+
+To redeploy your own copy, the same recipe works on any equivalent
+hosts:
 
 - **Backend** — any Python host that can run `uvicorn app.main:app`
   (Render, Railway, Fly.io, a VM, Docker). Set `CORS_ORIGINS` to your
   deployed frontend's URL.
-- **Frontend** — `npm run build` in `frontend/` produces a static
-  `frontend/dist/` you can deploy to any static host (Vercel, Netlify,
-  Cloudflare Pages, S3 + CDN). Set `VITE_API_BASE_URL` to your deployed
-  backend's URL at build time.
+- **Frontend** — any static host (Vercel, Netlify, Cloudflare Pages,
+  S3 + CDN). Set `VITE_API_BASE_URL` to your deployed backend's URL at
+  build time.
 
 ---
 
