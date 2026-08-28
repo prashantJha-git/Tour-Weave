@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: #FDF8F3;
+    color: #1D3D33;
+  }
+
+  h1, h2, h3, h4, .font-serif, .font-serif-luxury {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
+
+/* Editorial subtle borders & shadows */
+.editorial-card {
+  background-color: #ffffff;
+  border: 1px solid rgba(29, 61, 51, 0.08);
+  box-shadow: 0 4px 20px -2px rgba(29, 61, 51, 0.04);
+}
+
+.editorial-card-dark {
+  background-color: #1D3D33;
+  color: #ffffff;
+  border: 1px solid rgba(251, 192, 45, 0.15);
+}
+
+.editorial-card-gold {
+  background-color: rgba(251, 192, 45, 0.08);
+  border: 1px solid rgba(251, 192, 45, 0.25);
+}
+
+/* Custom delicate scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FDF8F3;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(29, 61, 51, 0.2);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #1D3D33;
+}
+
+/* Hide scrollbar for clean carousels */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+

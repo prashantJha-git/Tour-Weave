@@ -1,0 +1,7 @@
+{
+  "name": "Tour-Weaver",
+  "description": "AI-Powered Indian Tourism & Predictive Travel Platform with Crowd & Weather Intelligence",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
